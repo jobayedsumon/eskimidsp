@@ -24,6 +24,10 @@
         "sass-loader": "^11.0.1"
     },
     "dependencies": {
+        "@ant-design/icons": "^4.7.0",
+        "@emotion/react": "^11.8.2",
+        "@emotion/styled": "^11.8.1",
+        "antd": "^4.19.3",
         "react-router-dom": "^6.2.2"
     }
 }

@@ -1,18 +1,26 @@
-import React, { Component } from 'react'
+import "antd/dist/antd.css";
+import React from 'react'
 import ReactDOM from 'react-dom'
-import { BrowserRouter, Route, Switch } from 'react-router-dom'
-import Header from './Header'
+import {BrowserRouter, Route, Routes} from 'react-router-dom'
+import CommonLayout from './CommonLayout'
+import CampaignList from "./CampaignList";
+import CreateCampaign from "./CreateCampaign";
 
-class App extends Component {
-    render () {
-        return (
-            <BrowserRouter>
-                <div>
-                    <Header />
-                </div>
-            </BrowserRouter>
-        )
-    }
+
+const App = () => {
+
+    return (
+        <BrowserRouter>
+            <Routes>
+                <Route path="/" element={<CommonLayout children={<CampaignList/>}/>}/>
+                <Route path="/campaign/:id" element={<CommonLayout children={<CreateCampaign/>}/>}/>
+                <Route path="/new-campaign" element={<CommonLayout children={<CreateCampaign/>}/>}/>
+
+
+            </Routes>
+
+        </BrowserRouter>
+    )
 }
 
-ReactDOM.render(<App />, document.getElementById('app'))
+ReactDOM.render(<App/>, document.getElementById('app'))
