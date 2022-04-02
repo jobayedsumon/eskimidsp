@@ -5,6 +5,7 @@ import {BrowserRouter, Route, Routes} from 'react-router-dom'
 import CommonLayout from './CommonLayout'
 import CampaignList from "./CampaignList";
 import CreateCampaign from "./CreateCampaign";
+import EditCampaign from "./EditCampaign";
 
 
 const App = () => {
@@ -13,7 +14,7 @@ const App = () => {
         <BrowserRouter>
             <Routes>
                 <Route path="/" element={<CommonLayout children={<CampaignList/>}/>}/>
-                <Route path="/campaign/:id" element={<CommonLayout children={<CreateCampaign/>}/>}/>
+                <Route path="/campaign/:id" element={<CommonLayout children={<EditCampaign/>}/>}/>
                 <Route path="/new-campaign" element={<CommonLayout children={<CreateCampaign/>}/>}/>
 
 
