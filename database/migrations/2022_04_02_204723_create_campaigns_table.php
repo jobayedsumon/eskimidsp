@@ -20,7 +20,7 @@ class CreateCampaignsTable extends Migration
             $table->date('to_date');
             $table->float('total_budget');
             $table->float('daily_budget');
-            $table->text('creative_upload');
+            $table->text('creative_upload')->nullable();
             $table->timestamps();
         });
     }

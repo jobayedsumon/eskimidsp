@@ -1,35 +1,54 @@
-import React, { useState } from "react";
-import { Button, DatePicker, Form, Input, InputNumber, Upload } from "antd";
-import { InboxOutlined } from "@ant-design/icons";
-import { Link } from "react-router-dom";
+import React, {useState} from "react";
+import {Button, DatePicker, Form, Input, InputNumber, Upload, message} from "antd";
+import {InboxOutlined} from "@ant-design/icons";
+import {Link, useNavigate} from "react-router-dom";
 
-const { RangePicker } = DatePicker;
+const {RangePicker} = DatePicker;
 
 const CreateCampaign = () => {
+    const navigate = useNavigate();
+    const [fileList, setFileList] = useState([]);
     const fileUploadEvent = (e) => {
-        console.log("Upload event:", e);
-
+        setFileList(e.fileList);
         if (Array.isArray(e)) {
             return e;
         }
-
         return e && e.fileList;
     };
 
     const onFinish = (values) => {
-        console.log("Success:", values);
-       //submit form
-        fetch("/campaigns", {
-            method: "POST",
+        const formData = new FormData();
+        for (let [key, value] of Object.entries(values)) {
+            if (key === 'campaign_duration') {
+                formData.append('from_date', value[0].format('YYYY-MM-DD'));
+                formData.append('to_date', value[1].format('YYYY-MM-DD'));
+            } else if (key !== 'creative_upload') {
+                formData.append(key, value);
+            }
+        }
+
+        for (let i = 0; i < fileList.length; i++) {
+            formData.append('creative_upload[]', fileList[i].originFileObj);
+        }
+
+        //submit form
+        axios.post("/campaigns", formData, {
             headers: {
-                "Content-Type": "application/json",
+                'Content-Type': 'multipart/form-data',
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-            },
-            body: JSON.stringify(values),
+            }
         })
-            .then((res) => res.json())
-            .then((data) => console.log(data))
-            .catch((error) => console.error("Error:", error));
+        .then(res => {
+            if (res.status === 201) {
+                message.success('Campaign created successfully');
+                navigate('/');
+            } else {
+                message.success("Campaign couldn't create");
+
+            }
+
+        })
+        .catch((error) => console.error("Error:", error));
     };
 
     return (
@@ -49,7 +68,7 @@ const CreateCampaign = () => {
                         required
                         className="w-50"
                     >
-                        <Input />
+                        <Input/>
                     </Form.Item>
 
                     <Form.Item
@@ -57,7 +76,7 @@ const CreateCampaign = () => {
                         name="campaign_duration"
                         required
                     >
-                        <RangePicker />
+                        <RangePicker/>
                     </Form.Item>
                     <Form.Item
                         label="Total Budget (USD)"
@@ -65,7 +84,7 @@ const CreateCampaign = () => {
                         required
                     >
                         <InputNumber
-                            style={{ width: "200px" }}
+                            style={{width: "200px"}}
                             min={0}
                             precision={2}
                         />
@@ -76,7 +95,7 @@ const CreateCampaign = () => {
                         required
                     >
                         <InputNumber
-                            style={{ width: "200px" }}
+                            style={{width: "200px"}}
                             min={0}
                             precision={2}
                         />
@@ -99,7 +118,7 @@ const CreateCampaign = () => {
                                 beforeUpload={() => false}
                             >
                                 <p className="ant-upload-drag-icon">
-                                    <InboxOutlined />
+                                    <InboxOutlined/>
                                 </p>
                                 <p className="ant-upload-text">
                                     Click or drag images to this area to upload
