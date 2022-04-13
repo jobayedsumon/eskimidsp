@@ -43,7 +43,7 @@ const CreateCampaign = () => {
                 message.success('Campaign created successfully');
                 navigate('/');
             } else {
-                message.success("Campaign couldn't create");
+                message.error("Campaign couldn't create");
 
             }
 

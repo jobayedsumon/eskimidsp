@@ -17,7 +17,7 @@ class CampaignController extends Controller
     public function index()
     {
         //
-        $campaigns = Campaign::all();
+        $campaigns = Campaign::latest()->get();
         return response()->json($campaigns);
     }
 
@@ -47,7 +47,6 @@ class CampaignController extends Controller
             'to_date' => 'required|date',
             'daily_budget' => 'required|numeric',
             'total_budget' => 'required|numeric',
-            'creative_upload' => 'required',
         ]);
 
 
@@ -92,6 +91,7 @@ class CampaignController extends Controller
     public function show(Campaign $campaign)
     {
         //
+        return response()->json($campaign, 200);
     }
 
     /**
@@ -114,7 +114,59 @@ class CampaignController extends Controller
      */
     public function update(UpdateCampaignRequest $request, Campaign $campaign)
     {
-        //
+        //validate request
+        $validator = Validator::make($request->all(), [
+            'campaign_name' => 'required|string|max:255',
+            'from_date' => 'required|date',
+            'to_date' => 'required|date',
+            'daily_budget' => 'required|numeric',
+            'total_budget' => 'required|numeric',
+        ]);
+
+
+        if($validator->fails()){
+            return response()->json($validator->errors(), 400);
+        } else {
+            //create campaign and store in database
+            $campaign->campaign_name = $request->campaign_name;
+            $campaign->from_date = $request->from_date;
+            $campaign->to_date = $request->to_date;
+            $campaign->daily_budget = $request->daily_budget;
+            $campaign->total_budget = $request->total_budget;
+
+
+            if($request->images && $campaign->creative_upload) {
+                $creative_upload = json_decode($campaign->creative_upload);
+                $updatedImages = array_diff($creative_upload, $request->images);
+                if($updatedImages){
+                    foreach($updatedImages as $image){
+                        $path = public_path().'/images/'.$image;
+                        if(file_exists($path)){
+                            unlink($path);
+                        }
+                    }
+                }
+            }
+            $creative_upload = $request->images ?? [];
+
+            //upload multiple images
+            if($request->hasFile('creative_upload')) {
+                $files = $request->file('creative_upload');
+
+                foreach($files as $file){
+                    $filename = now().$file->getClientOriginalName();
+                    $file->move(public_path().'/images/', $filename);
+                    $creative_upload[] = $filename;
+                }
+
+            }
+
+            $campaign->creative_upload = json_encode($creative_upload);
+
+            $campaign->save();
+
+            return response()->json($campaign, 201);
+        }
     }
 
     /**
@@ -125,7 +177,16 @@ class CampaignController extends Controller
      */
     public function destroy(Campaign $campaign)
     {
-        //
+        //delete images
+        if($campaign->creative_upload){
+            $images = json_decode($campaign->creative_upload);
+            foreach($images as $image){
+                $path = public_path().'/images/'.$image;
+                if(file_exists($path)){
+                    unlink($path);
+                }
+            }
+        }
         $campaign->delete();
         return response()->json(['message' => 'Campaign deleted successfully']);
     }

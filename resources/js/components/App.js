@@ -14,10 +14,8 @@ const App = () => {
         <BrowserRouter>
             <Routes>
                 <Route path="/" element={<CommonLayout children={<CampaignList/>}/>}/>
-                <Route path="/campaign/:id" element={<CommonLayout children={<EditCampaign/>}/>}/>
                 <Route path="/new-campaign" element={<CommonLayout children={<CreateCampaign/>}/>}/>
-
-
+                <Route path="/edit-campaign/:id" element={<CommonLayout children={<EditCampaign/>}/>}/>
             </Routes>
 
         </BrowserRouter>
