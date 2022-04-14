@@ -18,7 +18,7 @@ class CampaignController extends Controller
     {
         //
         $campaigns = Campaign::latest()->get();
-        return response()->json($campaigns);
+        return response()->json($campaigns, 200);
     }
 
     /**
@@ -188,6 +188,6 @@ class CampaignController extends Controller
             }
         }
         $campaign->delete();
-        return response()->json(['message' => 'Campaign deleted successfully']);
+        return response()->json(['message' => 'Campaign deleted successfully'], 200);
     }
 }

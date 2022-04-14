@@ -1,14 +1,17 @@
 import * as React from 'react';
 
 import {Link, useNavigate} from "react-router-dom";
-import {Button, Space, Table} from "antd";
+import {Button, Modal, Space, Table, Carousel} from "antd";
 import {useEffect, useState} from "react";
-import {DeleteOutlined, EditOutlined} from "@ant-design/icons";
+import {DeleteOutlined, EditOutlined, EyeOutlined} from "@ant-design/icons";
+import moment from "moment";
 
 
 const CampaignList = () => {
     const navigate = useNavigate()
     const [dataSource, setDataSource] = useState([]);
+    const [images, setImages] = useState([]);
+    const [visible, setVisible] = useState(false);
     const columns = [
         {
             title: 'Campaign Name',
@@ -36,11 +39,14 @@ const CampaignList = () => {
             key: 'action',
             render: (text, record) => (
                 <Space size="middle">
+                    <Button type="primary" success onClick={() => previewImages(record.id)}>
+                        <EyeOutlined/>
+                    </Button>
                     <Button type="primary" onClick={() => navigate(`/edit-campaign/${record.id}`)}>
 
                         <EditOutlined/>
                     </Button>
-                    <Button type="danger" onClick={() => deleteCampaign(record.id)}>
+                    <Button type="primary" danger onClick={() => deleteCampaign(record.id)}>
                         <DeleteOutlined/>
 
                     </Button>
@@ -48,6 +54,21 @@ const CampaignList = () => {
             ),
         },
     ];
+
+    const previewImages = (id) => {
+        axios.get(`/campaigns/${id}`)
+            .then(res => {
+                if (res.status === 200) {
+                    const data = res.data;
+                    if(data.creative_upload) {
+                        setImages(JSON.parse(data.creative_upload));
+                        setVisible(true);
+                    }
+
+                }
+            })
+            .catch((error) => console.error("Error:", error));
+    }
 
     const getCampaigns = () => {
         fetch('http://localhost/campaigns', {
@@ -83,6 +104,26 @@ const CampaignList = () => {
     return (
 
         <div className="m-auto mt-5">
+
+            <Modal
+                title="Creative Uploads"
+                centered
+                visible={visible}
+                onOk={() => setVisible(false)}
+                onCancel={() => setVisible(false)}
+                width={800}
+                footer={null}
+
+            >
+                <Carousel effect="fade">
+                    {images && images.map((image, index) => (
+                        <div key={index}>
+                            <img height="300px" src={`/images/${image}`} alt=""/>
+                        </div>
+                    ))}
+                </Carousel>
+            </Modal>
+
             <div className="d-flex justify-content-between">
                 <h1>Campaign List</h1>
                 <Link to='/new-campaign'>

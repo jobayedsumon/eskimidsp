@@ -14,7 +14,7 @@ class CampaignTest extends TestCase
 
     public function test_get_all_campaigns()
     {
-        $campaign = Campaign::factory()->create();
+        $campaign = Campaign::factory(10)->create();
         $response = $this->json('GET', '/campaigns');
         $response->assertStatus(200);
     }
@@ -28,5 +28,32 @@ class CampaignTest extends TestCase
         ]);
 
         $response->assertStatus(201);
+    }
+
+    //test update campaign
+    public function test_update_campaign()
+    {
+        $campaign = Campaign::factory()->create();
+        $response = $this->json('PUT', '/campaigns/' . $campaign->id, $campaign->toArray(), [
+            'X-CSRF-TOKEN' => csrf_token(),
+        ]);
+
+        $response->assertStatus(201);
+    }
+
+    //test single campaign
+    public function test_show_single_campaign()
+    {
+        $campaign = Campaign::factory()->create();
+        $response = $this->json('GET', '/campaigns/' . $campaign->id);
+        $response->assertStatus(200);
+    }
+
+    //test delete campaign
+    public function test_delete_campaign()
+    {
+        $campaign = Campaign::factory()->create();
+        $response = $this->json('DELETE', '/campaigns/' . $campaign->id);
+        $response->assertStatus(200);
     }
 }
