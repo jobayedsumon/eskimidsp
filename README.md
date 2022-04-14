@@ -45,7 +45,7 @@
 # run the following command to test the api endpoints
     php vendor/bin/phpunit
   
-#run the following command to seed the database  
+# run the following command to seed the database  
     php artisan db:seed
 
 
